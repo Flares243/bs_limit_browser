@@ -1,5 +1,5 @@
 import 'package:bs_limit_browser/router.dart';
-import 'package:bs_limit_browser/theme.dart';
+import 'package:bs_limit_browser/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -15,7 +15,7 @@ class MyApp extends ConsumerWidget {
     final router = ref.read(appRouterProvider);
 
     return MaterialApp.router(
-      title: 'Flutter Demo',
+      title: 'Limit browser',
       theme: AppTheme.light,
       routerConfig: router,
     );
