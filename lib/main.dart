@@ -1,10 +1,17 @@
-import 'package:bs_limit_browser/router.dart';
-import 'package:bs_limit_browser/app_theme.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-void main() {
-  runApp(const ProviderScope(child: MyApp()));
+import 'app_theme.dart';
+import 'router.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  runApp(const ProviderScope(
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends ConsumerWidget {
@@ -12,11 +19,14 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // ref.read(appDatabaseProvider).deleteEverything();
+
     final router = ref.read(appRouterProvider);
 
     return MaterialApp.router(
       title: 'Limit browser',
       theme: AppTheme.light,
+      debugShowCheckedModeBanner: false,
       routerConfig: router,
     );
   }

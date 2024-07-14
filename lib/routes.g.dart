@@ -15,6 +15,10 @@ RouteBase get $homeScreenRoute => GoRouteData.$route(
       factory: $HomeScreenRouteExtension._fromState,
       routes: [
         GoRouteData.$route(
+          path: 'edit',
+          factory: $CardEditRouteExtension._fromState,
+        ),
+        GoRouteData.$route(
           path: 'detail',
           factory: $CardDetailRouteExtension._fromState,
         ),
@@ -38,9 +42,30 @@ extension $HomeScreenRouteExtension on HomeScreenRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
+extension $CardEditRouteExtension on CardEditRoute {
+  static CardEditRoute _fromState(GoRouterState state) => CardEditRoute(
+        $extra: state.extra as CardDetailModel?,
+      );
+
+  String get location => GoRouteData.$location(
+        '/edit',
+      );
+
+  void go(BuildContext context) => context.go(location, extra: $extra);
+
+  Future<T?> push<T>(BuildContext context) =>
+      context.push<T>(location, extra: $extra);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location, extra: $extra);
+
+  void replace(BuildContext context) =>
+      context.replace(location, extra: $extra);
+}
+
 extension $CardDetailRouteExtension on CardDetailRoute {
   static CardDetailRoute _fromState(GoRouterState state) => CardDetailRoute(
-        $extra: state.extra as CardUIModel?,
+        $extra: state.extra as CardDetailModel,
       );
 
   String get location => GoRouteData.$location(

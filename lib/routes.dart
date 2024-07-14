@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'screens/detail/detail_screen.dart';
+import 'screens/card_detail/card_detail.dart';
+import 'screens/card_edit/card_edit.dart';
+import 'screens/card_edit/card_edit.models.dart';
 import 'screens/home/home.dart';
-import 'screens/home/home.model.dart';
 
 part 'routes.g.dart';
 
 @TypedGoRoute<HomeScreenRoute>(
   path: '/',
   routes: [
+    TypedGoRoute<CardEditRoute>(
+      path: 'edit',
+    ),
     TypedGoRoute<CardDetailRoute>(
       path: 'detail',
     )
@@ -24,13 +28,27 @@ class HomeScreenRoute extends GoRouteData {
 }
 
 @immutable
-class CardDetailRoute extends GoRouteData {
-  const CardDetailRoute({this.$extra});
+class CardEditRoute extends GoRouteData {
+  const CardEditRoute({this.$extra});
 
-  final CardUIModel? $extra;
+  final CardDetailModel? $extra;
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return DetailScreen(item: $extra);
+    return CardEdit(item: $extra);
+  }
+}
+
+@immutable
+class CardDetailRoute extends GoRouteData {
+  const CardDetailRoute({
+    required this.$extra,
+  });
+
+  final CardDetailModel $extra;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return CardDetail(card: $extra);
   }
 }

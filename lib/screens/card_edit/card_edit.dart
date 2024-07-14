@@ -1,71 +1,85 @@
-import 'package:bs_limit_browser/screens/detail/detail_screen.presenter.dart';
-import 'package:bs_limit_browser/separator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-import '../home/home.model.dart';
+import '../../separator.dart';
+import 'card_edit.models.dart';
+import 'card_edit_presenter.dart';
+import 'card_edit_presenter.vars.dart';
 
-class DetailScreen extends ConsumerWidget {
-  const DetailScreen({
+class CardEdit extends ConsumerWidget {
+  const CardEdit({
     this.item,
     super.key,
   });
 
-  final CardUIModel? item;
+  final CardDetailModel? item;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final presenter = ref.watch(detailScreenPresProvider(card: item));
+    final provider = cardEditPresProvider(card: item);
 
-    final selectedDate = ValueNotifier(DateTime(0, 0, 0));
+    final vars = ref.read(cardEditPresVarsProvider);
+    final presenter = ref.watch(provider.notifier);
 
     return Scaffold(
       appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Form(
-          key: presenter.formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                onTapOutside: (event) =>
-                    FocusManager.instance.primaryFocus?.unfocus(),
-                decoration: const InputDecoration(
-                  label: Text('Label:'),
-                ),
-                validator: (value) {
-                  if (value?.isEmpty ?? true) {
-                    return 'Please fill this field.';
-                  }
+          key: vars.formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextFormField(
+                  controller: vars.titleController,
+                  onTapOutside: (event) =>
+                      FocusManager.instance.primaryFocus?.unfocus(),
+                  decoration: const InputDecoration(
+                    label: Text('Label:'),
+                  ),
+                  validator: (value) {
+                    if (value?.isEmpty ?? true) {
+                      return 'Please fill this field.';
+                    }
 
-                  return null;
-                },
-              ),
-              TextFormField(
-                onTapOutside: (event) =>
-                    FocusManager.instance.primaryFocus?.unfocus(),
-                decoration: const InputDecoration(
-                  label: Text('Url:'),
-                  hintText: 'https://example.com',
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value?.isEmpty ?? true) {
-                    return 'Please fill this field.';
-                  }
+                TextFormField(
+                  controller: vars.hrefController,
+                  onTapOutside: (event) =>
+                      FocusManager.instance.primaryFocus?.unfocus(),
+                  decoration: const InputDecoration(
+                    label: Text('Url:'),
+                    hintText: 'https://example.com',
+                  ),
+                  validator: (value) {
+                    if (value?.isEmpty ?? true) {
+                      return 'Please fill this field.';
+                    }
 
-                  return null;
-                },
-              ),
-              CustomDurationModal(date: selectedDate),
-            ],
+                    return null;
+                  },
+                ),
+                CustomDurationModal(
+                  initialDate: DateTime(0, 0, 0, 0, 0, item?.duration ?? 0),
+                  onDateChanged: (duration) => presenter.setDuration(duration),
+                ),
+              ],
+            ),
           ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          presenter.onSubmit(selectedDate.value);
+        onPressed: () async {
+          final result = await presenter.onSubmit();
+
+          if (context.mounted && result) {
+            context.pop(true);
+          }
         },
         child: const Icon(Icons.add),
       ),
@@ -76,34 +90,30 @@ class DetailScreen extends ConsumerWidget {
 class CustomDurationModal extends StatefulWidget {
   const CustomDurationModal({
     super.key,
-    required this.date,
+    required this.initialDate,
+    this.onDateChanged,
   });
 
-  final ValueNotifier<DateTime> date;
+  final DateTime initialDate;
+  final void Function(Duration duration)? onDateChanged;
 
   @override
   State<CustomDurationModal> createState() => _CustomDurationModalState();
 }
 
 class _CustomDurationModalState extends State<CustomDurationModal> {
-  late FixedExtentScrollController hourController;
-  late FixedExtentScrollController minuteController;
-  late FixedExtentScrollController secondController;
-
-  final dateFormat = DateFormat('HH:mm:ss');
-
   @override
   void initState() {
     super.initState();
 
     hourController = FixedExtentScrollController(
-      initialItem: widget.date.value.hour,
+      initialItem: widget.initialDate.hour,
     );
     minuteController = FixedExtentScrollController(
-      initialItem: widget.date.value.minute,
+      initialItem: widget.initialDate.minute,
     );
     secondController = FixedExtentScrollController(
-      initialItem: widget.date.value.second,
+      initialItem: widget.initialDate.second,
     );
   }
 
@@ -114,6 +124,22 @@ class _CustomDurationModalState extends State<CustomDurationModal> {
     secondController.dispose();
     super.dispose();
   }
+
+  void onDateChange() {
+    widget.onDateChanged?.call(
+      Duration(
+        hours: hourController.selectedItem,
+        minutes: minuteController.selectedItem,
+        seconds: secondController.selectedItem,
+      ),
+    );
+  }
+
+  late FixedExtentScrollController hourController;
+  late FixedExtentScrollController minuteController;
+  late FixedExtentScrollController secondController;
+
+  final dateFormat = DateFormat('HH:mm:ss');
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +159,7 @@ class _CustomDurationModalState extends State<CustomDurationModal> {
                   looping: true,
                   scrollController: hourController,
                   onSelectedItemChanged: (value) {
-                    widget.date.value = widget.date.value.copyWith(hour: value);
+                    onDateChange();
                   },
                   children: List.generate(
                     24,
@@ -155,8 +181,7 @@ class _CustomDurationModalState extends State<CustomDurationModal> {
                   looping: true,
                   scrollController: minuteController,
                   onSelectedItemChanged: (value) {
-                    widget.date.value =
-                        widget.date.value.copyWith(minute: value);
+                    onDateChange();
                   },
                   children: List.generate(
                     60,
@@ -178,8 +203,7 @@ class _CustomDurationModalState extends State<CustomDurationModal> {
                   looping: true,
                   scrollController: secondController,
                   onSelectedItemChanged: (value) {
-                    widget.date.value =
-                        widget.date.value.copyWith(second: value);
+                    onDateChange();
                   },
                   children: List.generate(
                     60,

@@ -6,3 +6,10 @@ linter:
 analyzer:
   plugins:
     - custom_lint
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - lib/generated_plugin_registrant.dart
+  errors:
+    invalid_annotation: ignore
+    unused_element: ignore
