@@ -59,169 +59,35 @@ extension $CardEditStateCopyWith on CardEditState {
 // RiverpodGenerator
 // **************************************************************************
 
-String _$cardEditPresHash() => r'34aa1bf23e0ebd235cb1b14d339aa903fb9045e7';
+String _$cardEditParamsHash() => r'52287dcd07a848ec5647c6d15578b4a9cec77968';
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
+/// See also [cardEditParams].
+@ProviderFor(cardEditParams)
+final cardEditParamsProvider = AutoDisposeProvider<CardDetailModel?>.internal(
+  cardEditParams,
+  name: r'cardEditParamsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$cardEditParamsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-abstract class _$CardEditPres
-    extends BuildlessAutoDisposeNotifier<CardEditState> {
-  late final CardDetailModel? card;
-
-  CardEditState build({
-    CardDetailModel? card,
-  });
-}
+typedef CardEditParamsRef = AutoDisposeProviderRef<CardDetailModel?>;
+String _$cardEditPresHash() => r'68fbe817aefdaaadb635053f1186564b5b78bb9c';
 
 /// See also [CardEditPres].
 @ProviderFor(CardEditPres)
-const cardEditPresProvider = CardEditPresFamily();
+final cardEditPresProvider =
+    AutoDisposeNotifierProvider<CardEditPres, CardEditState>.internal(
+  CardEditPres.new,
+  name: r'cardEditPresProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$cardEditPresHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
-/// See also [CardEditPres].
-class CardEditPresFamily extends Family<CardEditState> {
-  /// See also [CardEditPres].
-  const CardEditPresFamily();
-
-  /// See also [CardEditPres].
-  CardEditPresProvider call({
-    CardDetailModel? card,
-  }) {
-    return CardEditPresProvider(
-      card: card,
-    );
-  }
-
-  @override
-  CardEditPresProvider getProviderOverride(
-    covariant CardEditPresProvider provider,
-  ) {
-    return call(
-      card: provider.card,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'cardEditPresProvider';
-}
-
-/// See also [CardEditPres].
-class CardEditPresProvider
-    extends AutoDisposeNotifierProviderImpl<CardEditPres, CardEditState> {
-  /// See also [CardEditPres].
-  CardEditPresProvider({
-    CardDetailModel? card,
-  }) : this._internal(
-          () => CardEditPres()..card = card,
-          from: cardEditPresProvider,
-          name: r'cardEditPresProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$cardEditPresHash,
-          dependencies: CardEditPresFamily._dependencies,
-          allTransitiveDependencies:
-              CardEditPresFamily._allTransitiveDependencies,
-          card: card,
-        );
-
-  CardEditPresProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.card,
-  }) : super.internal();
-
-  final CardDetailModel? card;
-
-  @override
-  CardEditState runNotifierBuild(
-    covariant CardEditPres notifier,
-  ) {
-    return notifier.build(
-      card: card,
-    );
-  }
-
-  @override
-  Override overrideWith(CardEditPres Function() create) {
-    return ProviderOverride(
-      origin: this,
-      override: CardEditPresProvider._internal(
-        () => create()..card = card,
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        card: card,
-      ),
-    );
-  }
-
-  @override
-  AutoDisposeNotifierProviderElement<CardEditPres, CardEditState>
-      createElement() {
-    return _CardEditPresProviderElement(this);
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return other is CardEditPresProvider && other.card == card;
-  }
-
-  @override
-  int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, card.hashCode);
-
-    return _SystemHash.finish(hash);
-  }
-}
-
-mixin CardEditPresRef on AutoDisposeNotifierProviderRef<CardEditState> {
-  /// The parameter `card` of this provider.
-  CardDetailModel? get card;
-}
-
-class _CardEditPresProviderElement
-    extends AutoDisposeNotifierProviderElement<CardEditPres, CardEditState>
-    with CardEditPresRef {
-  _CardEditPresProviderElement(super.provider);
-
-  @override
-  CardDetailModel? get card => (origin as CardEditPresProvider).card;
-}
+typedef _$CardEditPres = AutoDisposeNotifier<CardEditState>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

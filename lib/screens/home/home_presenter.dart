@@ -3,13 +3,14 @@ import 'package:flutter/scheduler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../database/local/app_database.dart';
+import '../../utils.dart';
 import '../card_edit/card_edit.models.dart';
 
 part 'home_presenter.g.dart';
 
 @CopyWith()
 class HomeState {
-  HomeState({
+  const HomeState({
     required this.cardsList,
   });
 
@@ -22,7 +23,9 @@ class HomePres extends _$HomePres {
   HomeState build() {
     _database = ref.read(appDatabaseProvider);
 
-    return HomeState(
+    init();
+
+    return const HomeState(
       cardsList: [],
     );
   }
@@ -32,11 +35,28 @@ class HomePres extends _$HomePres {
   void init() {
     SchedulerBinding.instance.addPostFrameCallback(
       (timeStamp) async {
-        final cardList = await _database.allTodoItems;
+        var cardList = await _database.allTodoItems;
+        final now = DateTime.now();
 
-        state = state.copyWith(
-          cardsList: cardList,
-        );
+        cardList = cardList.map(
+          (e) {
+            if (e.timeoutDate != null &&
+                now.isAtLeastOneDayAfter(e.timeoutDate!)) {
+              final newCard = e.copyWith(
+                timeLeft: e.duration,
+                timeoutDate: null,
+              );
+
+              _database.updateCardDetail(newCard.toCompanion);
+
+              return newCard;
+            }
+
+            return e;
+          },
+        ).toList();
+
+        state = state.copyWith(cardsList: cardList);
       },
     );
   }

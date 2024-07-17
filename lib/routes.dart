@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 
 import 'screens/card_detail/card_detail.dart';
@@ -22,8 +22,10 @@ part 'routes.g.dart';
 @immutable
 class HomeScreenRoute extends GoRouteData {
   @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return const HomeScreen();
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return const CupertinoPage(
+      child: HomeScreen(),
+    );
   }
 }
 
@@ -34,8 +36,10 @@ class CardEditRoute extends GoRouteData {
   final CardDetailModel? $extra;
 
   @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return CardEdit(item: $extra);
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return CupertinoPage(
+      child: CardEdit(card: $extra),
+    );
   }
 }
 
@@ -48,7 +52,9 @@ class CardDetailRoute extends GoRouteData {
   final CardDetailModel $extra;
 
   @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return CardDetail(card: $extra);
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return CupertinoPage(
+      child: CardDetail(card: $extra),
+    );
   }
 }

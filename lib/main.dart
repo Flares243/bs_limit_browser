@@ -21,6 +21,13 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // ref.read(appDatabaseProvider).deleteEverything();
 
+    // return WidgetsApp(
+    //   color: Colors.blue,
+    //   builder: (context, child) {
+    //     return const Placeholder();
+    //   },
+    // );
+
     final router = ref.read(appRouterProvider);
 
     return MaterialApp.router(

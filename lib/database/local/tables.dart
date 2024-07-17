@@ -8,5 +8,6 @@ class CardUIModelTable extends Table {
   TextColumn get title => text()();
   TextColumn get url => text()();
   IntColumn get duration => integer()();
+  IntColumn get timeLeft => integer()();
   DateTimeColumn get timeoutDate => dateTime().nullable()();
 }

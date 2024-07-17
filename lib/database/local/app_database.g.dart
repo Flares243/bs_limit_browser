@@ -34,6 +34,12 @@ class $CardUIModelTableTable extends CardUIModelTable
   late final GeneratedColumn<int> duration = GeneratedColumn<int>(
       'duration', aliasedName, false,
       type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _timeLeftMeta =
+      const VerificationMeta('timeLeft');
+  @override
+  late final GeneratedColumn<int> timeLeft = GeneratedColumn<int>(
+      'time_left', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
   static const VerificationMeta _timeoutDateMeta =
       const VerificationMeta('timeoutDate');
   @override
@@ -41,7 +47,8 @@ class $CardUIModelTableTable extends CardUIModelTable
       'timeout_date', aliasedName, true,
       type: DriftSqlType.dateTime, requiredDuringInsert: false);
   @override
-  List<GeneratedColumn> get $columns => [id, title, url, duration, timeoutDate];
+  List<GeneratedColumn> get $columns =>
+      [id, title, url, duration, timeLeft, timeoutDate];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -73,6 +80,12 @@ class $CardUIModelTableTable extends CardUIModelTable
     } else if (isInserting) {
       context.missing(_durationMeta);
     }
+    if (data.containsKey('time_left')) {
+      context.handle(_timeLeftMeta,
+          timeLeft.isAcceptableOrUnknown(data['time_left']!, _timeLeftMeta));
+    } else if (isInserting) {
+      context.missing(_timeLeftMeta);
+    }
     if (data.containsKey('timeout_date')) {
       context.handle(
           _timeoutDateMeta,
@@ -96,6 +109,8 @@ class $CardUIModelTableTable extends CardUIModelTable
           .read(DriftSqlType.string, data['${effectivePrefix}url'])!,
       duration: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}duration'])!,
+      timeLeft: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}time_left'])!,
       timeoutDate: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}timeout_date']),
     );
@@ -112,12 +127,14 @@ class CardUIModelTableCompanion extends UpdateCompanion<CardDetailModel> {
   final Value<String> title;
   final Value<String> url;
   final Value<int> duration;
+  final Value<int> timeLeft;
   final Value<DateTime?> timeoutDate;
   const CardUIModelTableCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
     this.url = const Value.absent(),
     this.duration = const Value.absent(),
+    this.timeLeft = const Value.absent(),
     this.timeoutDate = const Value.absent(),
   });
   CardUIModelTableCompanion.insert({
@@ -125,15 +142,18 @@ class CardUIModelTableCompanion extends UpdateCompanion<CardDetailModel> {
     required String title,
     required String url,
     required int duration,
+    required int timeLeft,
     this.timeoutDate = const Value.absent(),
   })  : title = Value(title),
         url = Value(url),
-        duration = Value(duration);
+        duration = Value(duration),
+        timeLeft = Value(timeLeft);
   static Insertable<CardDetailModel> custom({
     Expression<int>? id,
     Expression<String>? title,
     Expression<String>? url,
     Expression<int>? duration,
+    Expression<int>? timeLeft,
     Expression<DateTime>? timeoutDate,
   }) {
     return RawValuesInsertable({
@@ -141,6 +161,7 @@ class CardUIModelTableCompanion extends UpdateCompanion<CardDetailModel> {
       if (title != null) 'title': title,
       if (url != null) 'url': url,
       if (duration != null) 'duration': duration,
+      if (timeLeft != null) 'time_left': timeLeft,
       if (timeoutDate != null) 'timeout_date': timeoutDate,
     });
   }
@@ -150,12 +171,14 @@ class CardUIModelTableCompanion extends UpdateCompanion<CardDetailModel> {
       Value<String>? title,
       Value<String>? url,
       Value<int>? duration,
+      Value<int>? timeLeft,
       Value<DateTime?>? timeoutDate}) {
     return CardUIModelTableCompanion(
       id: id ?? this.id,
       title: title ?? this.title,
       url: url ?? this.url,
       duration: duration ?? this.duration,
+      timeLeft: timeLeft ?? this.timeLeft,
       timeoutDate: timeoutDate ?? this.timeoutDate,
     );
   }
@@ -175,6 +198,9 @@ class CardUIModelTableCompanion extends UpdateCompanion<CardDetailModel> {
     if (duration.present) {
       map['duration'] = Variable<int>(duration.value);
     }
+    if (timeLeft.present) {
+      map['time_left'] = Variable<int>(timeLeft.value);
+    }
     if (timeoutDate.present) {
       map['timeout_date'] = Variable<DateTime>(timeoutDate.value);
     }
@@ -188,6 +214,7 @@ class CardUIModelTableCompanion extends UpdateCompanion<CardDetailModel> {
           ..write('title: $title, ')
           ..write('url: $url, ')
           ..write('duration: $duration, ')
+          ..write('timeLeft: $timeLeft, ')
           ..write('timeoutDate: $timeoutDate')
           ..write(')'))
         .toString();
@@ -212,6 +239,7 @@ typedef $$CardUIModelTableTableCreateCompanionBuilder
   required String title,
   required String url,
   required int duration,
+  required int timeLeft,
   Value<DateTime?> timeoutDate,
 });
 typedef $$CardUIModelTableTableUpdateCompanionBuilder
@@ -220,6 +248,7 @@ typedef $$CardUIModelTableTableUpdateCompanionBuilder
   Value<String> title,
   Value<String> url,
   Value<int> duration,
+  Value<int> timeLeft,
   Value<DateTime?> timeoutDate,
 });
 
@@ -245,6 +274,7 @@ class $$CardUIModelTableTableTableManager extends RootTableManager<
             Value<String> title = const Value.absent(),
             Value<String> url = const Value.absent(),
             Value<int> duration = const Value.absent(),
+            Value<int> timeLeft = const Value.absent(),
             Value<DateTime?> timeoutDate = const Value.absent(),
           }) =>
               CardUIModelTableCompanion(
@@ -252,6 +282,7 @@ class $$CardUIModelTableTableTableManager extends RootTableManager<
             title: title,
             url: url,
             duration: duration,
+            timeLeft: timeLeft,
             timeoutDate: timeoutDate,
           ),
           createCompanionCallback: ({
@@ -259,6 +290,7 @@ class $$CardUIModelTableTableTableManager extends RootTableManager<
             required String title,
             required String url,
             required int duration,
+            required int timeLeft,
             Value<DateTime?> timeoutDate = const Value.absent(),
           }) =>
               CardUIModelTableCompanion.insert(
@@ -266,6 +298,7 @@ class $$CardUIModelTableTableTableManager extends RootTableManager<
             title: title,
             url: url,
             duration: duration,
+            timeLeft: timeLeft,
             timeoutDate: timeoutDate,
           ),
         ));
@@ -291,6 +324,11 @@ class $$CardUIModelTableTableFilterComposer
 
   ColumnFilters<int> get duration => $state.composableBuilder(
       column: $state.table.duration,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<int> get timeLeft => $state.composableBuilder(
+      column: $state.table.timeLeft,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
@@ -323,6 +361,11 @@ class $$CardUIModelTableTableOrderingComposer
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 
+  ColumnOrderings<int> get timeLeft => $state.composableBuilder(
+      column: $state.table.timeLeft,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
   ColumnOrderings<DateTime> get timeoutDate => $state.composableBuilder(
       column: $state.table.timeoutDate,
       builder: (column, joinBuilders) =>
@@ -340,11 +383,11 @@ class $AppDatabaseManager {
 // RiverpodGenerator
 // **************************************************************************
 
-String _$appDatabaseHash() => r'4f48bd753c0b40b632cdb094df07cd563f818074';
+String _$appDatabaseHash() => r'8ab73ef1293e27f6de024928c2e888eefcb35e1d';
 
 /// See also [appDatabase].
 @ProviderFor(appDatabase)
-final appDatabaseProvider = AutoDisposeProvider<AppDatabase>.internal(
+final appDatabaseProvider = Provider<AppDatabase>.internal(
   appDatabase,
   name: r'appDatabaseProvider',
   debugGetCreateSourceHash:
@@ -353,6 +396,6 @@ final appDatabaseProvider = AutoDisposeProvider<AppDatabase>.internal(
   allTransitiveDependencies: null,
 );
 
-typedef AppDatabaseRef = AutoDisposeProviderRef<AppDatabase>;
+typedef AppDatabaseRef = ProviderRef<AppDatabase>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

@@ -20,18 +20,20 @@ class CardEditState {
 @riverpod
 class CardEditPres extends _$CardEditPres {
   @override
-  CardEditState build({CardDetailModel? card}) {
+  CardEditState build() {
     _vars = ref.watch(cardEditPresVarsProvider);
+    _params = ref.watch(cardEditParamsProvider);
 
-    _vars.titleController.text = card?.title ?? '';
-    _vars.hrefController.text = card?.url ?? '';
+    _vars.titleController.text = _params?.title ?? '';
+    _vars.hrefController.text = _params?.url ?? '';
 
     return CardEditState(
-      duration: Duration(seconds: card?.duration ?? 0),
+      duration: Duration(seconds: _params?.timeLeft ?? 0),
     );
   }
 
   late CardEditPresVars _vars;
+  late CardDetailModel? _params;
 
   void setDuration(Duration duration) {
     state = state.copyWith(duration: duration);
@@ -42,13 +44,15 @@ class CardEditPres extends _$CardEditPres {
       final database = ref.read(appDatabaseProvider);
 
       final newCard = CardUIModelTableCompanion.insert(
-        id: Value.absentIfNull(card?.id),
+        id: Value.absentIfNull(_params?.id),
         title: _vars.titleController.text,
         url: _vars.hrefController.text,
         duration: state.duration.inSeconds,
+        timeLeft:
+            _params != null ? _params!.timeLeft : state.duration.inSeconds,
       );
 
-      card != null
+      _params != null
           ? await database.updateCardDetail(newCard)
           : await database.cardUIModelTable.insertOne(newCard);
 
@@ -57,4 +61,9 @@ class CardEditPres extends _$CardEditPres {
 
     return false;
   }
+}
+
+@riverpod
+CardDetailModel? cardEditParams(CardEditParamsRef ref) {
+  throw Exception();
 }

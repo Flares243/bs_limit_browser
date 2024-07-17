@@ -9,20 +9,33 @@ import 'card_edit.models.dart';
 import 'card_edit_presenter.dart';
 import 'card_edit_presenter.vars.dart';
 
-class CardEdit extends ConsumerWidget {
-  const CardEdit({
-    this.item,
+class CardEdit extends StatelessWidget {
+  const CardEdit({super.key, this.card});
+
+  final CardDetailModel? card;
+
+  @override
+  Widget build(BuildContext context) {
+    return ProviderScope(
+      overrides: [
+        cardEditParamsProvider.overrideWithValue(card),
+        cardEditPresProvider
+      ],
+      child: const _CardEdit(),
+    );
+  }
+}
+
+class _CardEdit extends ConsumerWidget {
+  const _CardEdit({
     super.key,
   });
 
-  final CardDetailModel? item;
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final provider = cardEditPresProvider(card: item);
-
+    final presenter = ref.watch(cardEditPresProvider.notifier);
     final vars = ref.read(cardEditPresVarsProvider);
-    final presenter = ref.watch(provider.notifier);
+    final params = ref.read(cardEditParamsProvider);
 
     return Scaffold(
       appBar: AppBar(),
@@ -65,7 +78,7 @@ class CardEdit extends ConsumerWidget {
                   },
                 ),
                 CustomDurationModal(
-                  initialDate: DateTime(0, 0, 0, 0, 0, item?.duration ?? 0),
+                  initialDate: DateTime(0, 0, 0, 0, 0, params?.duration ?? 0),
                   onDateChanged: (duration) => presenter.setDuration(duration),
                 ),
               ],
