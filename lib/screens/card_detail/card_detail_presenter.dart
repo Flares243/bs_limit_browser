@@ -1,8 +1,10 @@
+import 'dart:async';
+
 import 'package:copy_with_extension/copy_with_extension.dart';
-import 'package:cron/cron.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pausable_timer/pausable_timer.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../database/local/app_database.dart';
@@ -26,11 +28,10 @@ class CardDetailPres extends _$CardDetailPres {
   CardDetailState build() {
     _params = ref.watch(cardDetailParamsProvider);
 
-    _schedule = _cron.schedule(
-      Schedule.parse('* * * * * *'),
+    _timer = PausableTimer.periodic(
+      const Duration(seconds: 1),
       () {
         if (state.timeLeft == 0) {
-          _schedule?.cancel();
           onTimeup();
           return;
         }
@@ -43,8 +44,7 @@ class CardDetailPres extends _$CardDetailPres {
     );
 
     ref.onDispose(() async {
-      await _schedule?.cancel();
-      _cron.close();
+      _timer.cancel();
     });
 
     return CardDetailState(
@@ -52,9 +52,8 @@ class CardDetailPres extends _$CardDetailPres {
     );
   }
 
-  final _cron = Cron();
   late CardDetailModel _params;
-  ScheduledTask? _schedule;
+  late PausableTimer _timer;
 
   var _isUpdating = false;
   Future<void> updateTimeleft(int newTimeleft) async {
@@ -76,6 +75,7 @@ class CardDetailPres extends _$CardDetailPres {
   }
 
   Future<void> onTimeup() async {
+    _timer.cancel();
     updateTimeleft(0);
 
     final context =
@@ -101,6 +101,14 @@ class CardDetailPres extends _$CardDetailPres {
         context.pop();
       }
     }
+  }
+
+  void startCountdown() {
+    _timer.start();
+  }
+
+  void pauseCountdown() {
+    _timer.pause();
   }
 }
 

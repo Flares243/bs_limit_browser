@@ -34,7 +34,8 @@ class _CardDetail extends ConsumerStatefulWidget {
   ConsumerState<_CardDetail> createState() => _CardDetailState();
 }
 
-class _CardDetailState extends ConsumerState<_CardDetail> {
+class _CardDetailState extends ConsumerState<_CardDetail>
+    with WidgetsBindingObserver {
   final webViewKey = GlobalKey();
   final dateFormat = DateFormat('HH:mm:ss');
 
@@ -43,6 +44,31 @@ class _CardDetailState extends ConsumerState<_CardDetail> {
   double progress = 0;
 
   bool canPop = false;
+
+  @override
+  void initState() {
+    super.initState();
+    presenter = ref.read(cardDetailPresProvider.notifier);
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    webViewController?.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      presenter.startCountdown();
+    } else {
+      presenter.pauseCountdown();
+    }
+  }
+
+  late CardDetailPres presenter;
 
   @override
   Widget build(BuildContext context) {
@@ -138,17 +164,18 @@ class _CardDetailState extends ConsumerState<_CardDetail> {
                       ),
                       onWebViewCreated: (controller) {
                         webViewController = controller;
+                        presenter.startCountdown();
                       },
                       onLoadStart: (controller, url) {
                         setState(() {
                           this.url = url.toString();
                         });
                       },
-                      onPermissionRequest: (controller, request) async {
-                        return PermissionResponse(
-                            resources: request.resources,
-                            action: PermissionResponseAction.GRANT);
-                      },
+                      onPermissionRequest: (controller, request) async =>
+                          PermissionResponse(
+                        resources: request.resources,
+                        action: PermissionResponseAction.GRANT,
+                      ),
                       shouldOverrideUrlLoading:
                           (controller, navigationAction) async {
                         var uri = navigationAction.request.url!;
