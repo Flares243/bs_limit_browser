@@ -29,15 +29,16 @@ class CardDetailPres extends _$CardDetailPres {
     _schedule = _cron.schedule(
       Schedule.parse('* * * * * *'),
       () {
+        if (state.timeLeft == 0) {
+          _schedule?.cancel();
+          onTimeup();
+          return;
+        }
+
         final newTimeleft = state.timeLeft - 1;
         state = state.copyWith(timeLeft: newTimeleft);
 
         updateTimeleft(newTimeleft);
-
-        if (state.timeLeft == 0) {
-          _schedule?.cancel();
-          onTimeup();
-        }
       },
     );
 
@@ -47,7 +48,7 @@ class CardDetailPres extends _$CardDetailPres {
     });
 
     return CardDetailState(
-      timeLeft: _params.duration,
+      timeLeft: _params.timeLeft,
     );
   }
 
