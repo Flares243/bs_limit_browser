@@ -1,6 +1,9 @@
+import 'package:bs_limit_browser/constant.dart';
+import 'package:bs_limit_browser/providers/shared_prefs_prov.dart';
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../database/local/app_database.dart';
 import '../../utils.dart';
@@ -22,6 +25,7 @@ class HomePres extends _$HomePres {
   @override
   HomeState build() {
     _database = ref.read(appDatabaseProvider);
+    _sharedPrefs = ref.read(sharedPrefsProvider);
 
     init();
 
@@ -31,6 +35,7 @@ class HomePres extends _$HomePres {
   }
 
   late AppDatabase _database;
+  late SharedPreferences _sharedPrefs;
 
   void init() {
     SchedulerBinding.instance.addPostFrameCallback(
@@ -38,10 +43,18 @@ class HomePres extends _$HomePres {
         var cardList = await _database.allTodoItems;
         final now = DateTime.now();
 
-        cardList = cardList.map(
-          (e) {
-            if (e.timeoutDate != null &&
-                now.isAtLeastOneDayAfter(e.timeoutDate!)) {
+        final prevFetchedDate = DateTime.fromMillisecondsSinceEpoch(
+          _sharedPrefs.getInt(lastFetchedTime) ?? 0,
+        );
+
+        if (now.isAtLeastOneDayAfter(prevFetchedDate)) {
+          _sharedPrefs.setInt(
+            lastFetchedTime,
+            now.millisecondsSinceEpoch,
+          );
+
+          cardList = cardList.map(
+            (e) {
               final newCard = e.copyWith(
                 timeLeft: e.duration,
                 timeoutDate: null,
@@ -50,11 +63,9 @@ class HomePres extends _$HomePres {
               _database.updateCardDetail(newCard.toCompanion);
 
               return newCard;
-            }
-
-            return e;
-          },
-        ).toList();
+            },
+          ).toList();
+        }
 
         state = state.copyWith(cardsList: cardList);
       },

@@ -74,7 +74,7 @@ final cardDetailParamsProvider = AutoDisposeProvider<CardDetailModel>.internal(
 );
 
 typedef CardDetailParamsRef = AutoDisposeProviderRef<CardDetailModel>;
-String _$cardDetailPresHash() => r'd1ae57b1fbf3aa8b5d2a0d5f40f344da8a36e040';
+String _$cardDetailPresHash() => r'4053d131660b1b0c5014b6ebfae4b14eaf4e6b1c';
 
 /// See also [CardDetailPres].
 @ProviderFor(CardDetailPres)

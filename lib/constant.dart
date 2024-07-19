@@ -11,3 +11,5 @@ enum TimeMeasurement {
 
   final String label;
 }
+
+const lastFetchedTime = 'LAST_FETCHED_TIME';

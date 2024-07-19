@@ -60,7 +60,7 @@ extension $HomeStateCopyWith on HomeState {
 // RiverpodGenerator
 // **************************************************************************
 
-String _$homePresHash() => r'6e4086869672d1bdb4dde457dd8ff88fa0565345';
+String _$homePresHash() => r'e28ec70594632d19b079e31c2ee40ce748644a83';
 
 /// See also [HomePres].
 @ProviderFor(HomePres)
