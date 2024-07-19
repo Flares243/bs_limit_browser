@@ -1,16 +1,10 @@
 # bs_limit_browser
 
-A new Flutter project.
+A time limit browser app.
+- Light weight.
+- Simple plain UI/UX, just use it as it is.
+- Time limit reset daily.
 
-## Getting Started
+## Demo
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+![2024-07-19 08 58 57](https://github.com/user-attachments/assets/688d6ba2-2a09-4445-8e81-ef141e651ef8)
