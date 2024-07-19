@@ -1,9 +1,11 @@
-# bs_limit_browser
+# Time Limit Browser (Bespoke Limit Browser)
 
-A time limit browser app.
-- Light weight.
-- Simple plain UI/UX, just use it as it is.
-- Time limit reset daily.
+A lightweight and simple browser application designed to help you avoid losing track of time on using internet for entertainment.
+
+Features:
+- Lightweight and efficient
+- Simple and intuitive UI/UX
+- Daily time limit reset
 
 ## Demo
 
