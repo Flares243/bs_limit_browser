@@ -1,38 +1,16 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:intl/intl.dart';
 
 import '../../routes.dart';
+import 'card_list_item.dart';
 import 'home_presenter.dart';
 
-class HomeScreen extends ConsumerStatefulWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends ConsumerState<HomeScreen>
-    with SingleTickerProviderStateMixin {
-  final dateFormat = DateFormat('HH:mm:ss');
-  late SlidableController slideController;
-
-  @override
-  void initState() {
-    super.initState();
-    slideController = SlidableController(this);
-  }
-
-  @override
-  void dispose() {
-    slideController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final presenter = ref.watch(homePresProvider.notifier);
 
     return Scaffold(
@@ -62,123 +40,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   (card) {
                     final isEnable = card.timeoutDate == null;
 
-                    return Slidable(
-                      controller: slideController,
-                      key: ValueKey(card.id),
-                      closeOnScroll: true,
-                      endActionPane: ActionPane(
-                        extentRatio: .4,
-                        motion: const ScrollMotion(),
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                ColoredBox(
-                                  color: Colors.red,
-                                  child: IconButton(
-                                    onPressed: () =>
-                                        presenter.onDeleteCard(card),
-                                    icon: const Icon(Icons.delete),
-                                  ),
-                                ),
-                                ColoredBox(
-                                  color: Colors.yellow.shade700,
-                                  child: IconButton(
-                                    onPressed: () async {
-                                      await slideController.close();
-
-                                      if (context.mounted) {
-                                        await CardEditRoute($extra: card)
-                                            .push(context);
-
-                                        presenter.init();
-                                      }
-                                    },
-                                    icon: const Icon(Icons.edit),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                      child: GestureDetector(
-                        onTap: isEnable
-                            ? () async {
-                                await slideController.close();
-
-                                if (context.mounted) {
-                                  await CardDetailRoute($extra: card)
-                                      .push(context);
-                                  presenter.init();
-                                }
-                              }
-                            : null,
-                        child: Card(
-                          elevation: 3,
-                          child: Container(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                RichText(
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  text: TextSpan(
-                                    children: [
-                                      if (!isEnable)
-                                        const WidgetSpan(
-                                          child: Padding(
-                                            padding: EdgeInsets.only(right: 4),
-                                            child: Icon(
-                                              Icons.do_not_touch_outlined,
-                                              color: Colors.red,
-                                            ),
-                                          ),
-                                        ),
-                                      TextSpan(
-                                        text: card.title,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Text(
-                                  card.url,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    decoration: TextDecoration.underline,
-                                    decorationThickness: .7,
-                                  ),
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Image.asset(
-                                      width: 24,
-                                      height: 24,
-                                      'assets/images/swipe_left.webp',
-                                    ),
-                                    Text(
-                                      dateFormat.format(
-                                        DateTime(0, 0, 0, 0, 0, card.timeLeft),
-                                      ),
-                                      style:
-                                          Theme.of(context).textTheme.bodySmall,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
+                    return CardListItem(
+                      card: card,
+                      isEnable: isEnable,
+                      onCardPressed: () async {
+                        if (context.mounted) {
+                          await CardDetailRoute($extra: card).push(context);
+                          presenter.init();
+                        }
+                      },
+                      onDeletePressed: () => presenter.onDeleteCard(card),
+                      onEditPressed: () async {
+                        if (context.mounted) {
+                          await CardEditRoute($extra: card).push(context);
+                          presenter.init();
+                        }
+                      },
                     );
                   },
                 ),
