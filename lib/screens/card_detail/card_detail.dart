@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -137,12 +138,15 @@ class _CardDetailState extends ConsumerState<_CardDetail>
           ],
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(14),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                url,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
+            child: GestureDetector(
+              onTap: () => Clipboard.setData(ClipboardData(text: url)),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  url,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
             ),
           ),
@@ -214,11 +218,6 @@ class _CardDetailState extends ConsumerState<_CardDetail>
                         setState(() {
                           this.url = url.toString();
                         });
-                      },
-                      onConsoleMessage: (controller, consoleMessage) {
-                        if (kDebugMode) {
-                          print(consoleMessage);
-                        }
                       },
                     ),
                     progress < 1.0

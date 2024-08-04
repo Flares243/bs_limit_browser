@@ -31,7 +31,7 @@ class CardDetailPres extends _$CardDetailPres {
     _timer = PausableTimer.periodic(
       const Duration(seconds: 1),
       () {
-        if (state.timeLeft == 0) {
+        if (state.timeLeft < 0) {
           onTimeup();
           return;
         }
@@ -55,11 +55,7 @@ class CardDetailPres extends _$CardDetailPres {
   late CardDetailModel _params;
   late PausableTimer _timer;
 
-  var _isUpdating = false;
   Future<void> updateTimeleft(int newTimeleft) async {
-    if (_isUpdating) return;
-    _isUpdating = true;
-
     final newCard = CardUIModelTableCompanion.insert(
       id: Value(_params.id),
       title: _params.title,
@@ -70,8 +66,6 @@ class CardDetailPres extends _$CardDetailPres {
     );
 
     await ref.read(appDatabaseProvider).updateCardDetail(newCard);
-
-    _isUpdating = false;
   }
 
   Future<void> onTimeup() async {
@@ -89,8 +83,8 @@ class CardDetailPres extends _$CardDetailPres {
             title: Text(
               'Times up!\nEnough for today~',
               style: TextStyle(
-                fontWeight: FontWeight.w600,
                 fontSize: 26,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),

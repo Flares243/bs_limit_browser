@@ -14,7 +14,6 @@ class AppDatabase extends _$AppDatabase {
   @override
   int get schemaVersion => 1;
 
-  // loads all todo entries
   Future<List<CardDetailModel>> get allTodoItems =>
       select(cardUIModelTable).get();
 
