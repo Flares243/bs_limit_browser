@@ -38,7 +38,8 @@ class HomeScreen extends ConsumerWidget {
               children: [
                 ...cardList.map(
                   (card) {
-                    final isEnable = card.timeoutDate == null;
+                    final isEnable =
+                        card.timeoutDate == null || card.timeLeft > 0;
 
                     return CardListItem(
                       card: card,
