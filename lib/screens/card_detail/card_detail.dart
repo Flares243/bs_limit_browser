@@ -77,15 +77,13 @@ class _CardDetailState extends ConsumerState<_CardDetail>
 
     return PopScope(
       canPop: canPop,
-      onPopInvoked: (didPop) async {
+      onPopInvokedWithResult: (didPop, result) async {
         final canGoback = await webViewController?.canGoBack() ?? false;
 
         if (!canPop && canGoback) {
           webViewController?.goBack();
         } else {
-          setState(() {
-            canPop = true;
-          });
+          setState(() => canPop = true);
         }
       },
       child: Scaffold(
@@ -104,9 +102,9 @@ class _CardDetailState extends ConsumerState<_CardDetail>
             mainAxisSize: MainAxisSize.min,
             textBaseline: TextBaseline.alphabetic,
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Facebook',
+                  params.title,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -194,9 +192,7 @@ class _CardDetailState extends ConsumerState<_CardDetail>
                           "about"
                         ].contains(uri.scheme)) {
                           if (await canLaunchUrl(uri)) {
-                            // Launch the App
                             await launchUrl(uri);
-                            // and cancel the request
                             return NavigationActionPolicy.CANCEL;
                           }
                         }
