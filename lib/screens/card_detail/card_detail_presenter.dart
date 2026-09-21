@@ -30,22 +30,10 @@ class CardDetailPres extends _$CardDetailPres {
 
     _timer = PausableTimer.periodic(
       const Duration(seconds: 1),
-      () {
-        if (state.timeLeft < 0) {
-          onTimeup();
-          return;
-        }
-
-        final newTimeleft = state.timeLeft - 1;
-        state = state.copyWith(timeLeft: newTimeleft);
-
-        updateTimeleft(newTimeleft);
-      },
+      _onTick,
     );
 
-    ref.onDispose(() async {
-      _timer.cancel();
-    });
+    ref.onDispose(() => _timer.cancel());
 
     return CardDetailState(
       timeLeft: _params.timeLeft,
@@ -55,14 +43,25 @@ class CardDetailPres extends _$CardDetailPres {
   late CardDetailModel _params;
   late PausableTimer _timer;
 
-  Future<void> updateTimeleft(int newTimeleft) async {
+  void _onTick() {
+    if (state.timeLeft <= 0) {
+      onTimeup();
+      return;
+    }
+
+    final newTimeLeft = state.timeLeft - 1;
+    state = state.copyWith(timeLeft: newTimeLeft);
+    unawaited(_persistTimeLeft(newTimeLeft));
+  }
+
+  Future<void> _persistTimeLeft(int newTimeLeft) async {
     final newCard = CardUIModelTableCompanion.insert(
       id: Value(_params.id),
       title: _params.title,
       url: _params.url,
       duration: _params.duration,
-      timeLeft: newTimeleft,
-      timeoutDate: Value.absentIfNull(newTimeleft <= 0 ? DateTime.now() : null),
+      timeLeft: newTimeLeft,
+      timeoutDate: Value.absentIfNull(newTimeLeft <= 0 ? DateTime.now() : null),
     );
 
     await ref.read(appDatabaseProvider).updateCardDetail(newCard);
@@ -70,30 +69,26 @@ class CardDetailPres extends _$CardDetailPres {
 
   Future<void> onTimeup() async {
     _timer.cancel();
-    updateTimeleft(0);
+    unawaited(_persistTimeLeft(0));
 
     final context =
         ref.read(appRouterProvider).configuration.navigatorKey.currentContext;
 
-    if (context != null) {
-      if (context.mounted) {
-        await showDialog(
-          context: context,
-          builder: (dialogContext) => const AlertDialog(
-            title: Text(
-              'Times up!\nEnough for today~',
-              style: TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.w600,
-              ),
+    if (context != null && context.mounted) {
+      await showDialog(
+        context: context,
+        builder: (dialogContext) => const AlertDialog(
+          title: Text(
+            'Times up!\nEnough for today~',
+            style: TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.w600,
             ),
           ),
-        );
-      }
+        ),
+      );
 
-      if (context.mounted) {
-        context.pop();
-      }
+      context.pop();
     }
   }
 
