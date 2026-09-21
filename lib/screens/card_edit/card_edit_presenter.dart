@@ -28,7 +28,7 @@ class CardEditPres extends _$CardEditPres {
     _vars.hrefController.text = _params?.url ?? '';
 
     return CardEditState(
-      duration: Duration(seconds: _params?.timeLeft ?? 0),
+      duration: Duration(seconds: _params?.duration ?? 0),
     );
   }
 
@@ -43,13 +43,19 @@ class CardEditPres extends _$CardEditPres {
     if (_vars.formKey.currentState?.validate() ?? false) {
       final database = ref.read(appDatabaseProvider);
 
+      final durationChanged = _params != null &&
+          _params!.duration != state.duration.inSeconds;
+
+      final newTimeLeft = durationChanged
+          ? state.duration.inSeconds
+          : _params?.timeLeft ?? state.duration.inSeconds;
+
       final newCard = CardUIModelTableCompanion.insert(
         id: Value.absentIfNull(_params?.id),
         title: _vars.titleController.text,
         url: _vars.hrefController.text,
         duration: state.duration.inSeconds,
-        timeLeft:
-            _params != null ? _params!.timeLeft : state.duration.inSeconds,
+        timeLeft: newTimeLeft,
       );
 
       _params != null
