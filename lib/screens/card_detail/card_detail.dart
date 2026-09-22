@@ -10,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../card_edit/card_edit.models.dart';
 import 'card_detail_presenter.dart';
+import 'image_download.dart';
 
 class CardDetail extends StatelessWidget {
   const CardDetail({super.key, required this.card});
@@ -163,6 +164,7 @@ class _CardDetailState extends ConsumerState<_CardDetail>
                         mediaPlaybackRequiresUserGesture: false,
                         allowsInlineMediaPlayback: true,
                         iframeAllowFullscreen: true,
+                        useOnDownloadStart: true,
                       ),
                       onWebViewCreated: (controller) {
                         webViewController = controller;
@@ -203,6 +205,34 @@ class _CardDetailState extends ConsumerState<_CardDetail>
                         setState(() {
                           this.url = url.toString();
                         });
+                      },
+                      onLongPressHitTestResult:
+                          (controller, hitTestResult) async {
+                        final imageSrc = hitTestResult.extra;
+                        final type = hitTestResult.type;
+                        final isImage =
+                            type == InAppWebViewHitTestResultType.IMAGE_TYPE ||
+                                type ==
+                                    InAppWebViewHitTestResultType
+                                        .SRC_IMAGE_ANCHOR_TYPE;
+                        if (!isImage || imageSrc == null || imageSrc.isEmpty) {
+                          return;
+                        }
+                        if (!mounted) return;
+                        await showImageContextMenu(
+                          context,
+                          imageSrc,
+                          pageUrl: url,
+                        );
+                      },
+                      onDownloadStartRequest:
+                          (controller, downloadStartRequest) async {
+                        if (!mounted) return;
+                        await ImageDownloadHelper.downloadImage(
+                          context,
+                          downloadStartRequest.url.toString(),
+                          pageUrl: url,
+                        );
                       },
                       onProgressChanged: (controller, progress) {
                         setState(() {
